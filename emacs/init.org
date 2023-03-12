@@ -1,0 +1,624 @@
+# -*- compile-command: "emacsclient -e '(org-babel-tangle-file (buffer-file-name (window-buffer (selected-window))))'" -*-
+
+#+TITLE: Emacs Configuration
+#+PROPERTY: header-args :emacs-lisp :tangle yes
+
+This is a “literate” [[https://orgmode.org/][Org Mode]] Emacs configuration file. To use it: save it to the [[elisp:(message "%s" user-emacs-directory)][Emacs directory]], open it, and run [[elisp:org-babel-tangle][(org-babel-tangle)]].
+
+#+begin_src emacs-lisp
+(server-mode)
+#+end_src
+
+** Packages
+
+Packages linked in this document are installed automatically by [[https://nixos.org/][Nix]] via [[file:~/.config/nixpkgs/home.nix::elpaPackages][home.nix]].
+
+- https://melpa.org/#/add-hooks
+- https://melpa.org/#/daemons
+- https://melpa.org/#/flycheck
+- https://melpa.org/#/org-bookmark-heading
+
+#+begin_src emacs-lisp
+(package-initialize)
+#+end_src
+
+** Customizations
+
+I use the [[elisp:customize][customization interface]] for settings that are individual preference and/or don’t require documentation.
+
+#+begin_src emacs-lisp
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file)
+#+end_src
+
+Some configuration doesn’t make sense to publish.
+
+#+begin_src emacs-lisp
+(org-babel-load-file (expand-file-name "private.org" user-emacs-directory))
+#+end_src
+
+* Appearance
+
+** Theme
+
+- https://elpa.gnu.org/packages/modus-themes.html
+
+#+begin_src emacs-lisp
+(load-theme 'modus-vivendi)
+#+end_src
+
+** Indicators
+
+- https://melpa.org/#/doom-modeline
+
+#+begin_src emacs-lisp
+(doom-modeline-mode)
+(setq doom-modeline-indent-info nil)
+(setq doom-modeline-minor-modes nil)
+(tool-bar-mode -1)
+(setq visible-bell t)
+#+end_src
+
+** Fonts
+
+#+begin_src emacs-lisp
+(set-fontset-font t 'symbol (font-spec :family "Symbola") nil 'prepend)
+(set-fontset-font t 'symbol (font-spec :family "Noto Emoji") nil 'prepend)
+#+end_src
+
+** Icons
+
+- https://melpa.org/#/all-the-icons
+- https://melpa.org/#/all-the-icons-completion
+- https://search.nixos.org/packages?show=emacs-all-the-icons-fonts
+
+#+begin_src emacs-lisp
+(all-the-icons-completion-mode)
+#+end_src
+
+** Delimiters
+
+- https://melpa.org/#/rainbow-delimiters
+
+#+begin_src emacs-lisp
+(add-hooks-pair '(org-mode prog-mode text-mode) #'rainbow-delimiters-mode)
+
+(show-paren-mode)
+
+(setq bidi-inhibit-bpa t)
+#+end_src
+
+** Page Breaks
+
+Page breaks (form feeds) are useful for breaking up sections in plain text files. We can make them appear as horizontal rules.
+
+- https://melpa.org/#/page-break-lines
+
+#+begin_src emacs-lisp
+(global-page-break-lines-mode)
+#+end_src
+
+To insert a page break: ~C-q C-l~
+
+To jump between pages: ~C-x [~ and ~C-x ]~
+
+
+
+** Whitespace
+
+#+begin_src emacs-lisp
+(add-hooks-pair '(org-mode text-mode prog-mode) #'(whitespace-mode))
+(setq whitespace-style '(face trailing tabs empty space-before-tab tab-mark))
+#+end_src
+
+** Hide Passwords
+
+Prevent shoulder surfing when editing sensitive files.
+
+- https://melpa.org/#/hidepw
+
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.gpg\\'" . hidepw-mode))
+#+end_src
+
+* Interface
+
+** Candidates
+
+- https://elpa.gnu.org/packages/vertico.html
+
+#+begin_src emacs-lisp
+(vertico-mode)
+#+end_src
+
+- https://melpa.org/#/marginalia
+
+#+begin_src emacs-lisp
+(marginalia-mode)
+
+(general-def minibuffer-local-map
+  "M-a" #'marginalia-cycle)
+#+end_src
+
+** Completion
+
+- https://melpa.org/#/fussy
+
+#+begin_src emacs-lisp
+(setq completion-ignore-case t)
+(push 'fussy completion-styles)
+(setq fussy-use-cache t)
+(setq completion-category-defaults nil
+      completion-category-overrides nil)
+#+end_src
+
+- https://elpa.gnu.org/packages/consult.html
+
+#+begin_src emacs-lisp
+(general-def
+  "C-c m" #'consult-man
+  "C-c M-x" #'consult-mode-command
+  "C-c M-:" #'consult-complex-command
+  "C-x b" #'consult-buffer
+  "C-x B" #'consult-buffer-other-window
+  "C-x r b" #'consult-bookmark
+  "M-g f" #'consult-flycheck
+  "M-g g" #'consult-goto-line
+  "M-g i" #'consult-imenu
+  "M-g I" #'consult-imenu-multi
+  "M-g M-g" #'consult-goto-line
+  "M-y" #'consult-yank-pop
+  "M-s d" #'consult-find
+  "M-s g" #'consult-ripgrep
+  "M-s G" #'consult-git-grep)
+(setq consult-narrow-key "<")
+#+end_src
+
+#+begin_src emacs-lisp
+(electric-pair-mode)
+#+end_src
+
+- https://melpa.org/#/typo
+
+#+begin_src emacs-lisp
+(add-hooks-pair '(org-mode text-mode) #'(typo-mode))
+#+end_src
+
+** Context
+
+- https://elpa.gnu.org/packages/embark.html
+- https://elpa.gnu.org/packages/embark-consult.html
+
+#+begin_src emacs-lisp
+(general-def
+  "C-." #'embark-act
+  "M-." #'embark-dwim
+  "C-h B" #'embark-bindings)
+
+(add-hook 'embark-collect-mode-hook #'consult-preview-at-point-mode)
+#+end_src
+
+** Cursors
+
+- https://melpa.org/#/multiple-cursors
+
+#+begin_src emacs-lisp
+(general-def
+  "C->" #'mc/mark-next-like-this
+  "C-<" #'mc/mark-previous-like-this
+  "C-c C-e" #'mc/edit-lines)
+#+end_src
+
+** Keyboard
+
+- https://melpa.org/#/general
+
+To find candidate keys: [[elisp:free-keys][(free-keys)]]
+
+- https://melpa.org/#/free-keys
+
+To describe keybindings: [[elisp:general-describe-keybindings][(general-describe-keybindings)]]
+
+- https://melpa.org/#/which-key
+
+#+begin_src emacs-lisp
+(which-key-mode)
+(general-def
+  "C-c k" #'which-key-show-major-mode
+  "C-c K" #'which-key-show-top-level)
+#+end_src
+
+*** Global Keybindings
+
+#+begin_src emacs-lisp
+(general-def
+  "M-SPC" #'cycle-spacing
+  "M-k" #'kill-whole-line
+
+  "M-o" #'other-window
+
+  "M-c" #'capitalize-dwim
+  "M-l" #'downcase-dwim
+  "M-u" #'upcase-dwim
+
+  "C-c c" #'recompile
+  "C-c u" #'revert-buffer
+
+  "C-c b" #'browse-url-at-point)
+#+end_src
+
+** Prompts
+
+Never require a full =yes= or =no= confirmation. A single character is enough.
+
+#+begin_src emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+Disable prompting for confirmation when:
+ - quitting an ediff session
+ - saving a new flyspell dictionary item
+
+#+begin_src emacs-lisp
+(defun disable-y-or-n-p (orig-fun &rest args)
+  (cl-letf (((symbol-function 'y-or-n-p) (lambda (prompt) t)))
+    (apply orig-fun args)))
+
+(advice-add 'ediff-quit :around #'disable-y-or-n-p)
+(advice-add 'ispell-word :around #'disable-y-or-n-p)
+#+end_src
+
+** Search
+
+- https://melpa.org/#/ctrlf
+
+#+begin_src emacs-lisp
+(ctrlf-mode)
+#+end_src
+
+- https://melpa.org/#/dumb-jump
+
+#+begin_src emacs-lisp
+(add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+#+end_src
+
+** Undo
+
+- https://elpa.gnu.org/packages/undo-tree.html
+
+Open the undo-tree interface with ~C-x u~.
+
+#+begin_src emacs-lisp
+(setq global-undo-tree-mode t)
+(setq undo-tree-history-directory-alist `(("." . ,(expand-file-name "undo" user-emacs-directory))))
+#+end_src
+
+** Windows
+
+Split ediff windows side-by-side.
+
+#+begin_src emacs-lisp
+(setq ediff-window-setup-function #'ediff-setup-windows-plain)
+(setq ediff-split-window-function #'split-window-horizontally)
+#+end_src
+
+#+begin_src emacs-lisp
+(setq gdb-many-windows t)
+#+end_src
+
+* Buffers
+
+- https://melpa.org/#/scratch
+- https://melpa.org/#/vlf
+
+#+begin_src emacs-lisp
+(save-place-mode)
+
+(global-auto-revert-mode)
+#+end_src
+
+** Direnv
+
+- https://melpa.org/#/envrc
+- https://melpa.org/#/inheritenv
+
+#+begin_src emacs-lisp
+(envrc-global-mode)
+#+end_src
+
+** ibuffer
+
+- https://melpa.org/#/all-the-icons-ibuffer
+
+#+begin_src emacs-lisp
+(defalias 'list-buffers 'ibuffer)
+(add-hook 'ibuffer-mode-hook #'all-the-icons-ibuffer-mode)
+#+end_src
+
+* Files
+
+#+begin_src emacs-lisp
+(recentf-mode)
+#+end_src
+
+http://emacsredux.com/blog/2013/03/27/copy-filename-to-the-clipboard/
+
+#+begin_src emacs-lisp
+(defun copy-file-name ()
+  "Copy the current buffer file name to the clipboard."
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (when filename
+      (kill-new filename)
+      (message "Copied buffer file name '%s' to the clipboard." filename))))
+#+end_src
+
+** Backups
+
+#+begin_src emacs-lisp
+(setq backup-directory-alist '(("." . (expand-file-name "backups" user-emacs-directory))))
+(setq version-control t)
+#+end_src
+
+** Directories
+
+#+begin_src emacs-lisp
+(setq dired-kill-when-opening-new-dired-buffer t)
+(setq dired-listing-switches "-alh")
+(setq dired-recursive-copies 'always)
+(setq dired-recursive-deletes 'always)
+#+end_src
+
+- https://melpa.org/#/diredfl
+
+#+begin_src emacs-lisp
+(diredfl-global-mode)
+#+end_src
+
+- https://melpa.org/#/dired-collapse
+
+#+begin_src emacs-lisp
+(add-hook 'dired-mode-hook #'dired-collapse-mode)
+#+end_src
+
+** File types
+
+- https://elpa.gnu.org/packages/csv-mode.html
+- https://elpa.gnu.org/packages/pdf-tools.html
+
+#+begin_src emacs-lisp
+(pdf-tools-install nil t)
+#+end_src
+
+- https://melpa.org/#/yaml-mode
+
+** Projects
+
+- https://melpa.org/#/projectile
+
+#+begin_src emacs-lisp
+(setq projectile-completion-system 'default)
+
+(general-def projectile-mode-map
+  "C-c p" #'projectile-command-map)
+#+end_src
+
+** Revision Control
+
+- https://melpa.org/#/diff-hl
+
+#+begin_src emacs-lisp
+(global-diff-hl-mode)
+#+end_src
+
+*** Git
+
+- https://melpa.org/#/magit
+- https://melpa.org/#/magit-delta
+- https://search.nixos.org/packages?show=delta
+
+#+begin_src emacs-lisp
+(general-def "C-c g" #'magit-file-dispatch)
+(add-hook 'magit-mode-hook (lambda () (magit-delta-mode)))
+#+end_src
+
+** Search
+
+- https://melpa.org/#/rg
+- https://melpa.org/#/wgrep
+- https://search.nixos.org/packages?show=ripgrep
+
+#+begin_src emacs-lisp
+(rg-enable-default-bindings)
+#+end_src
+
+* Development
+
+- https://melpa.org/#/editorconfig
+
+#+begin_src emacs-lisp
+(editorconfig-mode)
+#+end_src
+
+- https://melpa.org/#/highlight-indent-guides
+
+#+begin_src emacs-lisp
+(add-hook 'prog-mode-hook #'highlight-indent-guides-mode)
+#+end_src
+
+- https://melpa.org/#/smartscan
+
+#+begin_src emacs-lisp
+(add-hook 'prog-mode-hook #'smartscan-mode)
+#+end_src
+
+- https://melpa.org/#/terraform-mode
+
+** Compilation
+
+- https://melpa.org/#/fancy-compilation
+
+#+begin_src emacs-lisp
+(add-to-list 'compilation-finish-functions
+  (lambda (buffer status) (call-process "notify-send" nil nil nil
+                            "-t" "5000"
+                            "-i" "emacs"
+                            "compilation finished"
+                            status)))
+#+end_src
+
+** Bash
+
+- https://search.nixos.org/packages?show=shellcheck
+
+#+begin_src emacs-lisp
+(auto-insert-mode)
+(add-to-list 'auto-insert-alist
+       '(sh-mode "Nix packages: " "#!/usr/bin/env nix-shell
+" "#!nix-shell -i bash -p " str "
+set -Eeuo pipefail
+shopt -s nullglob
+
+"))
+#+end_src
+
+** Docker
+
+- https://melpa.org/#/docker-tramp
+- https://melpa.org/#/dockerfile-mode
+- https://search.nixos.org/packages?show=hadolint
+
+#+begin_src emacs-lisp
+(put 'dockerfile-image-name 'safe-local-variable #'stringp)
+#+end_src
+
+** Fish
+
+- https://melpa.org/#/fish-mode
+
+** Haskell
+
+- https://melpa.org/#/haskell-mode
+- https://melpa.org/#/dante
+
+#+begin_src emacs-lisp
+(add-hook 'haskell-mode-hook #'dante-mode)
+(general-def dante-mode-map
+  "C-c :" (lambda () (interactive) (dante-type-at t)))
+
+(add-hooks-pair '(haskell-mode) #'(flycheck-mode hlint-refactor-mode))
+(add-hook 'dante-mode-hook
+  (lambda () (flycheck-add-next-checker 'haskell-dante
+                                        '(warning . haskell-hlint))))
+#+end_src
+
+** JSON
+
+- https://melpa.org/#/jsonian
+- https://search.nixos.org/packages?show=nodePackages.jsonlint
+
+#+begin_src emacs-lisp
+(jsonian-enable-flycheck)
+#+end_src
+
+** Nix
+
+- https://melpa.org/#/nix-mode
+
+#+begin_src emacs-lisp
+(require 'nix-shebang)
+(add-to-list 'interpreter-mode-alist '("nix-shell" . nix-shebang-mode))
+#+end_src
+
+** Rust
+
+- https://melpa.org/#/eglot
+- https://melpa.org/#/rust-mode
+- https://melpa.org/#/rustic
+
+#+begin_src emacs-lisp
+(add-hook 'rust-mode-hook #'flycheck-mode)
+(setq rustic-lsp-client 'eglot)
+#+end_src
+
+** TypeScript
+
+- https://melpa.org/#/tide
+
+#+begin_src emacs-lisp
+(add-hook 'typescript-mode-hook
+  (lambda ()
+    (tide-setup)
+    (flycheck-mode)
+    (eldoc-mode)
+    (tide-hl-identifier-mode)))
+#+end_src
+
+* Documents
+
+#+begin_src emacs-lisp
+(setq sentence-end-double-space nil)
+#+end_src
+
+** Markdown
+
+- https://melpa.org/#/markdown-mode
+- https://melpa.org/#/markdown-preview-mode
+
+Use GitHub-flavored markdown where likely.
+
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+#+end_src
+
+Use markdown mode for R Markdown.
+
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.Rmd\\'" . markdown-mode))
+#+end_src
+
+** Diagrams
+
+- https://melpa.org/#/graphviz-dot-mode
+- https://melpa.org/#/mermaid-mode
+- https://search.nixos.org/packages?show=nodePackages.mermaid-cli
+
+** Macros
+
+#+begin_src emacs-lisp
+(defun j/insert-current-date ()
+ "Insert today's date using the current locale."
+    (interactive)
+    (insert (calendar-date-string (calendar-current-date))))
+(general-def "C-c i t" #'j/insert-current-date)
+#+end_src
+
+** Spelling
+
+#+begin_src emacs-lisp
+(setq ispell-program-name "aspell")
+
+(add-hooks-pair '(org-mode text-mode) #'(flyspell-mode))
+#+end_src
+
+There is also ~flyspell-prog-mode~, but it uses too much CPU.
+
+Add word to dictionary: =M-$ i=
+
+Don’t flag acronyms or other all-caps words as misspellings.
+
+#+begin_src emacs-lisp
+(defun j/string-all-caps-p (string)
+  "Return non-nil iff STRING is all capital letters."
+  (save-match-data
+    (let ((case-fold-search nil))
+      (string-match "\\`[A-Z]+\\'" string))))
+
+(defun j/flyspell-incorrect (beg end info)
+  (when (j/string-all-caps-p (buffer-substring beg end))
+    t))
+
+(add-hook 'flyspell-incorrect-hook #'j/flyspell-incorrect)
+#+end_src

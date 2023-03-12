@@ -1,0 +1,31 @@
+/* Color code this profile. */
+#PanelUI-menu-button {
+  color: var(--toolbar-field-focus-border-color) !important;
+}
+
+/* Bring the browser window to the top. */
+#browser {
+  -moz-box-ordinal-group: 0 !important;
+}
+
+#TabsToolbar, #PersonalToolbar, #back-button, #forward-button, #stop-reload-button, #home-button {
+  visibility: collapse !important;
+}
+
+/* Expand the address bar upwards from the bottom. */
+.urlbarView {
+  position: absolute !important;
+  bottom: var(--urlbar-toolbar-height);
+  background-color: Field;
+}
+
+/* Remove search engine suggestions from the address bar. */
+.urlbarView .search-one-offs {
+  display: none !important;
+}
+
+/* This disables sidebar headers (history sidebar, tab sidebar, etc.) */
+/* Since every vertical tab addon we will try have a different id, we just disable all sidebar headers */
+#sidebar-box #sidebar-header {
+  display: none;
+}
