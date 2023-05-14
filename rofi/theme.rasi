@@ -1,0 +1,65 @@
+* {
+  primary: #0860f2E6;
+  bg: #7E7E7E80;
+
+  background-color: transparent;
+  text-color: #EEE;
+}
+
+window {
+  width: 50%;
+  border-radius: 0.25em;
+  background-color: #000;
+}
+
+inputbar {
+  padding: 0.25em;
+  spacing: 0.5em;
+}
+
+message {
+  border: 2 0 0;
+  border-color: @bg;
+  background-color: @bg;
+}
+
+listview {
+  fixed-height: true;
+  lines: 20;
+  scrollbar: true;
+  border: 1 0 0;
+  border-color: @bg;
+}
+
+scrollbar {
+  border-radius: 10;
+  handle-width: 10;
+  handle-color: @primary;
+  background-color: @bg;
+}
+
+element {
+  padding: 0.25em 0.5em;
+  spacing: 0.5em;
+}
+
+element normal active {
+  text-color: @primary;
+}
+
+element selected normal, element selected active {
+  background-color: @primary;
+}
+
+element-icon {
+  size: 1em;
+}
+
+error-message {
+  border: 1;
+  border-color: red;
+}
+
+textbox {
+  padding: 0.5em;
+}

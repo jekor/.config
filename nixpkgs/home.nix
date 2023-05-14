@@ -8,7 +8,6 @@ in {
     enable = true;
     settings = {
       "*" = {
-        trim_trailing_whitespace = true;
         insert_final_newline = false;
         indent_size = 2;
         indent_style = "space";
@@ -64,7 +63,6 @@ in {
     blender # https://www.blender.org/
     dbeaver # https://dbeaver.io/
     digikam # https://www.digikam.org/
-    diskonaut # https://github.com/imsnif/diskonaut
     gimp # https://www.gimp.org/
     inkscape # https://inkscape.org/
     ipe # https://ipe.otfried.org/
@@ -76,6 +74,8 @@ in {
     xfce.thunar # https://docs.xfce.org/xfce/thunar/start
   ] ++ [ # utilities
     buku # https://github.com/jarun/buku
+    choose
+    diskonaut # https://github.com/imsnif/diskonaut
     dogdns # https://github.com/ogham/dog
     dua # https://github.com/Byron/dua-cli/
     duf # https://github.com/muesli/duf
@@ -184,7 +184,7 @@ in {
       cfg = {
         enableBukubrow = true;
         enableTridactylNative = true;
-      };
+      } // private.firefox.cfg;
       extraPolicies = {
         DisableFirefoxStudies = true;
         DisablePocket = true;
@@ -303,7 +303,7 @@ in {
     plugins = with pkgs; [
       rofi-calc
     ];
-    theme = "glue_pro_blue";
+    theme = ../rofi/theme.rasi;
   };
 
   programs.yt-dlp.enable = true;
@@ -419,10 +419,10 @@ in {
       rofi = "${config.programs.rofi.finalPackage}/bin/rofi";
       shortcuts = {
         "M-a" = "${pkgs.autorandr}/bin/autorandr --change";
-        "M-b" = "${pkgs.rofi-bluetooth}/bin/rofi-bluetooth";
+        "M-b" = "${rofi} -show windowcd -show-icons -window-format '{t}'";
+        "M-w" = "${rofi} -show window -show-icons";
         "M-c" = "${rofi} -show calc -modi calc -no-show-match -no-sort";
         "M-f" = "${pkgs.xfce.thunar}/bin/thunar";
-        "M-g" = "${rofi} -show window -show-icons";
         "M-i" = "${pkgs.xcolor}/bin/xcolor -s"; # copy color from screen to clipboard
         "M-n" = "${pkgs.playerctl}/bin/playerctl --player playerctld next";
         "M-p" = "${pkgs.playerctl}/bin/playerctl --player playerctld play-pause";
@@ -433,6 +433,7 @@ in {
         "M-=" = "${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+";
         "M--" = "${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-";
         "M-S-a" = "${pkgs.pavucontrol}/bin/pavucontrol";
+        "M-S-b" = "${pkgs.rofi-bluetooth}/bin/rofi-bluetooth";
         "M-S-r" = "${rofi} -show drun -modi drun -show-icons";
         "M-S-s" = "${config.services.flameshot.package}/bin/flameshot gui";
         "M-C-a" = "${pkgs.arandr}/bin/arandr";

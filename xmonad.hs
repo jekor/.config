@@ -49,6 +49,7 @@ main = do
     , manageHook = composeAll [ manageDocks
                               -- xprop | grep CLASS
                               , className =? "mpv" --> doCenterFloat
+                              , className =? "Calendar" --> doCenterFloat
                               , manageHook def ]
     , workspaces = spaces
     , layoutHook = avoidStruts $ ifWider 1920 (smartBorders layouts) (noBorders Full)

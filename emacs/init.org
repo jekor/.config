@@ -11,7 +11,7 @@ This is a “literate” [[https://orgmode.org/][Org Mode]] Emacs configuration 
 
 ** Packages
 
-Packages linked in this document are installed automatically by [[https://nixos.org/][Nix]] via [[file:~/.config/nixpkgs/home.nix::elpaPackages][home.nix]].
+Packages linked in this document are installed automatically by [[https://nixos.org/][Nix]] via [[file:../nixpkgs/home.nix::elpaPackages][home.nix]].
 
 - https://melpa.org/#/add-hooks
 - https://melpa.org/#/daemons
@@ -39,6 +39,10 @@ Some configuration doesn’t make sense to publish.
 
 * Appearance
 
+#+begin_src emacs-lisp
+(setq inhibit-startup-screen t)
+#+end_src
+
 ** Theme
 
 - https://elpa.gnu.org/packages/modus-themes.html
@@ -53,10 +57,10 @@ Some configuration doesn’t make sense to publish.
 
 #+begin_src emacs-lisp
 (doom-modeline-mode)
-(setq doom-modeline-indent-info nil)
-(setq doom-modeline-minor-modes nil)
-(tool-bar-mode -1)
+(setq column-number-mode t)
 (setq visible-bell t)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
 #+end_src
 
 ** Fonts
@@ -106,8 +110,10 @@ To jump between pages: ~C-x [~ and ~C-x ]~
 
 ** Whitespace
 
+- https://melpa.org/#/ws-butler
+
 #+begin_src emacs-lisp
-(add-hooks-pair '(org-mode text-mode prog-mode) #'(whitespace-mode))
+(add-hooks-pair '(org-mode text-mode prog-mode) #'(whitespace-mode ws-butler-mode))
 (setq whitespace-style '(face trailing tabs empty space-before-tab tab-mark))
 #+end_src
 
@@ -289,7 +295,7 @@ Disable prompting for confirmation when:
 Open the undo-tree interface with ~C-x u~.
 
 #+begin_src emacs-lisp
-(setq global-undo-tree-mode t)
+(global-undo-tree-mode)
 (setq undo-tree-history-directory-alist `(("." . ,(expand-file-name "undo" user-emacs-directory))))
 #+end_src
 
@@ -317,15 +323,6 @@ Split ediff windows side-by-side.
 (global-auto-revert-mode)
 #+end_src
 
-** Direnv
-
-- https://melpa.org/#/envrc
-- https://melpa.org/#/inheritenv
-
-#+begin_src emacs-lisp
-(envrc-global-mode)
-#+end_src
-
 ** ibuffer
 
 - https://melpa.org/#/all-the-icons-ibuffer
@@ -336,6 +333,8 @@ Split ediff windows side-by-side.
 #+end_src
 
 * Files
+
+- https://search.nixos.org/packages?show=unzip
 
 #+begin_src emacs-lisp
 (recentf-mode)
@@ -390,6 +389,7 @@ http://emacsredux.com/blog/2013/03/27/copy-filename-to-the-clipboard/
 
 #+begin_src emacs-lisp
 (pdf-tools-install nil t)
+(setq pdf-view-display-size 'fit-height)
 #+end_src
 
 - https://melpa.org/#/yaml-mode
@@ -399,8 +399,8 @@ http://emacsredux.com/blog/2013/03/27/copy-filename-to-the-clipboard/
 - https://melpa.org/#/projectile
 
 #+begin_src emacs-lisp
+(projectile-mode)
 (setq projectile-completion-system 'default)
-
 (general-def projectile-mode-map
   "C-c p" #'projectile-command-map)
 #+end_src
@@ -416,31 +416,29 @@ http://emacsredux.com/blog/2013/03/27/copy-filename-to-the-clipboard/
 *** Git
 
 - https://melpa.org/#/magit
-- https://melpa.org/#/magit-delta
 - https://search.nixos.org/packages?show=delta
 
 #+begin_src emacs-lisp
 (general-def "C-c g" #'magit-file-dispatch)
-(add-hook 'magit-mode-hook (lambda () (magit-delta-mode)))
 #+end_src
 
 ** Search
 
-- https://melpa.org/#/rg
 - https://melpa.org/#/wgrep
+
+- https://melpa.org/#/deadgrep
 - https://search.nixos.org/packages?show=ripgrep
+
+#+begin_src emacs-lisp
+#+end_src
+
+- https://melpa.org/#/rg
 
 #+begin_src emacs-lisp
 (rg-enable-default-bindings)
 #+end_src
 
 * Development
-
-- https://melpa.org/#/editorconfig
-
-#+begin_src emacs-lisp
-(editorconfig-mode)
-#+end_src
 
 - https://melpa.org/#/highlight-indent-guides
 
@@ -467,6 +465,19 @@ http://emacsredux.com/blog/2013/03/27/copy-filename-to-the-clipboard/
                             "-i" "emacs"
                             "compilation finished"
                             status)))
+#+end_src
+
+** Formatting
+
+- https://melpa.org/#/editorconfig
+
+#+begin_src emacs-lisp
+(editorconfig-mode)
+#+end_src
+
+#+begin_src emacs-lisp
+(setq comment-auto-fill-only-comments t)
+(setq require-final-newline nil)
 #+end_src
 
 ** Bash
@@ -508,7 +519,7 @@ shopt -s nullglob
 (general-def dante-mode-map
   "C-c :" (lambda () (interactive) (dante-type-at t)))
 
-(add-hooks-pair '(haskell-mode) #'(flycheck-mode hlint-refactor-mode))
+(add-hook 'haskell-mode-hook #'flycheck-mode)
 (add-hook 'dante-mode-hook
   (lambda () (flycheck-add-next-checker 'haskell-dante
                                         '(warning . haskell-hlint))))
@@ -531,6 +542,16 @@ shopt -s nullglob
 (require 'nix-shebang)
 (add-to-list 'interpreter-mode-alist '("nix-shell" . nix-shebang-mode))
 #+end_src
+
+** Org
+
+#+begin_src emacs-lisp
+(setq org-link-file-path-type 'relative)
+#+end_src
+
+** R
+
+- https://melpa.org/#/ess
 
 ** Rust
 
@@ -585,6 +606,10 @@ Use markdown mode for R Markdown.
 - https://melpa.org/#/mermaid-mode
 - https://search.nixos.org/packages?show=nodePackages.mermaid-cli
 
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.mmd\\'" . mermaid-mode))
+#+end_src
+
 ** Macros
 
 #+begin_src emacs-lisp
@@ -621,4 +646,17 @@ Don’t flag acronyms or other all-caps words as misspellings.
     t))
 
 (add-hook 'flyspell-incorrect-hook #'j/flyspell-incorrect)
+#+end_src
+
+* Init
+
+Some initialization needs to be done late so that hooks are executed early.
+
+** Direnv
+
+- https://melpa.org/#/envrc
+- https://melpa.org/#/inheritenv
+
+#+begin_src emacs-lisp
+(envrc-global-mode)
 #+end_src
