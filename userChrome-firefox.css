@@ -3,9 +3,9 @@
   color: var(--toolbar-field-focus-border-color) !important;
 }
 
-/* Bring the browser window to the top. */
+/* Move the toolbar to the bottom (by moving the browser element up). */
 #browser {
-  -moz-box-ordinal-group: 0 !important;
+  order: -1;
 }
 
 #TabsToolbar, #PersonalToolbar, #back-button, #forward-button, #stop-reload-button, #home-button {

@@ -74,14 +74,15 @@ in {
     xfce.thunar # https://docs.xfce.org/xfce/thunar/start
   ] ++ [ # utilities
     buku # https://github.com/jarun/buku
-    choose
+    choose # https://github.com/theryangeary/choose
     diskonaut # https://github.com/imsnif/diskonaut
     dogdns # https://github.com/ogham/dog
     dua # https://github.com/Byron/dua-cli/
     duf # https://github.com/muesli/duf
     gping # https://github.com/orf/gping
     lsof # https://github.com/lsof-org/lsof
-    xorg.xev
+    trippy # https://trippy.cli.rs/
+    xorg.xev # https://gitlab.freedesktop.org/xorg/app/xev
   ] ++ [ # DBus
     gnome3.file-roller # Thunar
     gnome3.sushi # Thunar

@@ -555,13 +555,11 @@ shopt -s nullglob
 
 ** Rust
 
-- https://melpa.org/#/eglot
 - https://melpa.org/#/rust-mode
 - https://melpa.org/#/rustic
 
 #+begin_src emacs-lisp
 (add-hook 'rust-mode-hook #'flycheck-mode)
-(setq rustic-lsp-client 'eglot)
 #+end_src
 
 ** TypeScript
